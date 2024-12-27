@@ -6,6 +6,7 @@
 	name = "Borrowed Time"
 	desc = "Shield your fellow man from the Undermaiden's gaze, preventing them from slipping into death for as long as your faith and fatigue may muster."
 	req_items = list(/obj/item/clothing/neck/roguetown/psicross)
+	overlay_state = "borrowtime"
 	associated_skill = /datum/skill/magic/holy
 	miracle = TRUE
 	devotion_cost = 10
@@ -28,7 +29,7 @@
 		to_chat(user, span_warning("I must be beside [living_target] to avert Her gaze from [living_target.p_them()]!"))
 		revert_cast()
 		return FALSE
-	
+
 	// add the no-death trait to them....
 	user.visible_message(span_notice("Whispering motes gently bead from [user]'s fingers as [user.p_they()] place a hand near [living_target], scriptures of the Undermaiden spilling from their lips..."), span_notice("I stand beside [living_target] and utter the hallowed words of Aeon's Intercession, staying Her grasp for just a little while longer..."))
 	to_chat(user, span_small("I must remain still and at [living_target]'s side..."))
@@ -54,7 +55,7 @@
 		else
 			to_chat(span_warning("My devotion runs dry - the Intercession fades from my lips!"))
 			break
-	
+
 	REMOVE_TRAIT(living_target, TRAIT_NODEATH, "avert_spell")
 
 	user.visible_message(span_danger("[user]'s concentration breaks, the motes receding from [living_target] and into [user.p_their()] hand once more."), span_danger("My concentration breaks, and the Intercession falls silent."))
@@ -83,7 +84,7 @@
 	var/debuff_power = 1
 	if (user && user.mind)
 		debuff_power = clamp((user.mind.get_skill_level(/datum/skill/magic/holy) / 2), 1, 3)
-	
+
 	var/too_powerful = FALSE
 	var/list/things_to_churn = list()
 	for (var/mob/living/L in targets)
@@ -103,7 +104,7 @@
 				break
 		if (L.mob_biotypes & MOB_UNDEAD || is_vampire || is_zombie)
 			things_to_churn += L
-	
+
 	if (!too_powerful)
 		if (LAZYLEN(things_to_churn))
 			user.visible_message(span_warning("A frigid blue glower suddenly erupts in [user]'s eyes as a whispered prayer summons forth a winding veil of ghostly mists!"), span_notice("I perform the sacred rite of Abrogation, bringing forth Her servants to harry and weaken the unliving!"))
@@ -140,7 +141,7 @@
 	if (caster)
 		debuffer = WEAKREF(caster)
 	return ..()
-	
+
 /datum/status_effect/churned/on_apply()
 	var/filter = owner.get_filter(CHURN_FILTER)
 	to_chat(owner, span_warning("Wisps leap from the cloying mists to surround me, their chill disrupting my body! FLEE!"))
@@ -170,5 +171,105 @@
 
 /datum/status_effect/churned/on_remove()
 	owner.remove_filter(CHURN_FILTER)
+
+/obj/effect/proc_holder/spell/targeted/trackdead
+	name = "Eye of Necra"
+	range = 50
+	overlay_state= "necraeye"
+	desc = "Focus your minds eye to find the dead and undead near by, however some things are strong enough to avoid necras sight"
+	releasedrain = 30
+	chargedloop = /datum/looping_sound/invokeholy
+	chargetime = 70
+	chargedrain = 0.5
+	charge_max = 30 SECONDS
+	max_targets = 0
+	cast_without_targets = TRUE
+	req_items = list(/obj/item/clothing/neck/roguetown/psicross)
+	sound = 'sound/magic/churn.ogg'
+	associated_skill = /datum/skill/magic/holy
+	invocation_emote_self = "Undermaiden guide me to those near your grasp..."
+	invocation_type = "whisper" //can be none, whisper, emote and shout
+	miracle = TRUE
+	devotion_cost = 15
+
+
+/obj/effect/proc_holder/spell/targeted/trackdead/cast(list/targets, mob/living/user = usr)
+	. = ..()
+
+	var/list/death_track = list()
+	var/list/hidden_power = list() //we are AWARE of them, just not where they are
+	for(var/mob/living/L in targets)
+		var/is_vampire = FALSE
+		var/is_zombie = FALSE
+		var/hidden = FALSE
+		var/is_dead = FALSE //We can find bodies as well
+
+		if(L.mind)
+			var/datum/antagonist/vampirelord/lesser/V = L.mind.has_antag_datum(/datum/antagonist/vampirelord/lesser)
+			if(V && !V.disguised)
+				is_vampire = TRUE
+			if(V && V.disguised)
+				hidden = TRUE
+			if(L.stat == DEAD)
+				is_dead = TRUE
+			if(L.mind.has_antag_datum(/datum/antagonist/zombie))
+				is_zombie = TRUE
+			if(L.mind.special_role == "Vampire Lord")
+				hidden = TRUE
+
+		if(L.mob_biotypes & MOB_UNDEAD || is_vampire || is_zombie || is_dead)
+			death_track += L
+		if(L.mob_biotypes & hidden )
+			hidden_power += L
+
+		if(LAZYLEN(death_track))
+			for(var/mob/living/thing in death_track)
+
+				var/distance = get_dist(user, thing)
+				if(distance <= 7)//got to be a proc i could make this into...
+					continue
+				var/dirtext = " to the "
+				var/direction = get_dir(user, thing)
+				switch(direction)
+					if(NORTH)
+						dirtext += "north"
+					if(SOUTH)
+						dirtext += "south"
+					if(EAST)
+						dirtext += "east"
+					if(WEST)
+						dirtext += "west"
+					if(NORTHWEST)
+						dirtext += "northwest"
+					if(NORTHEAST)
+						dirtext += "northeast"
+					if(SOUTHWEST)
+						dirtext += "southwest"
+					if(SOUTHEAST)
+						dirtext += "southeast"
+					else //Where ARE you.
+						dirtext = "although I cannot make out an exact direction"
+
+				var/disttext
+				switch(distance)
+					if(0 to 10)
+						disttext = " within 10 paces"
+					if(10 to 30)
+						disttext = " 10 to 30 paces away"
+					if(30 to 50)
+						disttext = " far"
+					else
+						disttext = " very far"
+
+
+			to_chat(user, span_dead("I sense something, [disttext],[dirtext]..."))
+
+		else
+			to_chat(user, span_dead("I failed to sense anything...")) //we didn't find anything but go check the hidden list
+
+		if(LAZYLEN(hidden_power))//shorter cause they are all sneaky
+			to_chat(src, span_dead("I sense something but they are obscured from my minds eye..."))
+
+	return
 
 #undef CHURN_FILTER

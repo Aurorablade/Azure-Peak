@@ -61,7 +61,7 @@
 		"THE OCEAN'S FURY IS ABYSSOR'S WILL!",
 		"I AM DRAWN BY THE PULL OF THE TIDE!",
 	)
-	
+
 /datum/patron/divine/ravox
 	name = "Ravox"
 	domain = "God of Justice, Glory, Battle"
@@ -81,7 +81,7 @@
 	mob_traits = list(TRAIT_SOUL_EXAMINE)
 	t1 = /obj/effect/proc_holder/spell/invoked/avert
 	t2 = /obj/effect/proc_holder/spell/targeted/abrogation
-	t3 = /obj/effect/proc_holder/spell/targeted/soulspeak
+	t3 = /obj/effect/proc_holder/spell/targeted/trackdead
 	confess_lines = list(
 		"ALL SOULS FIND THEIR WAY TO NECRA!",
 		"THE UNDERMAIDEN IS OUR FINAL REPOSE!",
