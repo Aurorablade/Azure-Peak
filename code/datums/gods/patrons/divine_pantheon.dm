@@ -78,7 +78,7 @@
 	domain = "Goddess of Death and the Afterlife"
 	desc = "Veiled Lady of the underworld, equally feared and respected by mortals. She taught mortals the inevitability of death and cares for them as they reach the afterlife."
 	worshippers = "The Dead, Mourners, Gravekeepers"
-	mob_traits = list(TRAIT_SOUL_EXAMINE)
+	mob_traits = list(TRAIT_SOUL_EXAMINE, TRAIT_STEELHEARTED)
 	t1 = /obj/effect/proc_holder/spell/invoked/avert
 	t2 = /obj/effect/proc_holder/spell/targeted/abrogation
 	t3 = /obj/effect/proc_holder/spell/targeted/trackdead

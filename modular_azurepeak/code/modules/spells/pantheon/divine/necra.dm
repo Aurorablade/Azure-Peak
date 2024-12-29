@@ -187,7 +187,7 @@
 	req_items = list(/obj/item/clothing/neck/roguetown/psicross)
 	sound = 'sound/magic/churn.ogg'
 	associated_skill = /datum/skill/magic/holy
-	invocation_emote_self = "Undermaiden guide me to those near your grasp..."
+	invocation = "Undermaiden guide me to those near your grasp..."
 	invocation_type = "whisper" //can be none, whisper, emote and shout
 	miracle = TRUE
 	devotion_cost = 15
@@ -226,7 +226,7 @@
 			for(var/mob/living/thing in death_track)
 
 				var/distance = get_dist(user, thing)
-				if(distance <= 7)//got to be a proc i could make this into...
+				if(distance <= 7)
 					continue
 				var/dirtext = " to the "
 				var/direction = get_dir(user, thing)
@@ -257,12 +257,12 @@
 					if(10 to 30)
 						disttext = " 10 to 30 paces away"
 					if(30 to 50)
-						disttext = " far"
+						disttext = " 30 to 50 paces away"
 					else
 						disttext = " very far"
 
 
-			to_chat(user, span_dead("I sense something, [disttext],[dirtext]..."))
+				to_chat(user, span_dead("I sense something, [disttext],[dirtext]..."))
 
 		else
 			to_chat(user, span_dead("I failed to sense anything...")) //we didn't find anything but go check the hidden list
